@@ -1,0 +1,71 @@
+Neste arquivo irei descrever os erros que impedem o funcionamento do sistema proposto.
+
+1) Erros na digitação das variáveis e referências: 
+ - Idex.php(linha 6) ao invés de index.php, impedindo a renderização do sistema.
+ 
+ - Variável $cep utilizada incorretamente na chamada da função get_address como "$cp", fazendo com que a requisição fosse realizada com uma variável inexistente. 
+ 
+ - Variável $address escrita incorretamente como $addres e $adress em vários casos, impedindo a exibição do endereço recuperado. Além disso, o logradouro está escrito como 'logradoro', fazendo com que o nome da rua não seja recuperado corretamente.
+
+2) Erro na formatação da url requisitante para o Viacep : http://viacep.com.br/ws$cep/xml/ -> o elemento 'ws' e o cep requisitado devem estar separados por "/", além disso, a variável $Cep deve ser inserida entre '{ }', para que se evite ambiguidades que comprometam o funcionamento, a forma correta seria: http://viacep.com.br/ws/{$cep}/xml/.
+
+3) Falta de validações para vários casos do processo de consulta, como:
+    - Cep com tamanho inválido.
+    - Cep com caracteres que não sejam dígitos.
+    - Resposta de feedback para falhas na consulta.
+
+    Implementei todas essas verificações.
+
+4) Ausência do "@" na chamada da função 'simplexml_load_file'. O operador @ é utilizado para suprimir mensagens de erros que possam ser geradas em caso de falha na requisição à API, fazendo com que não seja exibidas na tela e permitindo um tratamento mais adequado
+
+
+
+Adaptaçoes: 
+
+Para que houvesse a estilização com CSS, modifiquei a exibição do endereço para elementos HTML, que recebem os valores de variáveis definidas para cada informação do endereço. Quando o cep é validado e a requisição do endereço é realizada com sucesso, as variáveis são atualizadas. Além disso, coloquei o corpo do código PHP no início do arquivo, para que as informações pudessem ser carregadas corretamente antes de exibidas.
+
+Adicionei as validações necessárias para a formatação correta do CEP.
+
+Melhorias: 
+
+Separar Lógica de Negócios da Lógica de Apresentação: Atualmente, o código mistura lógica de negócios (validação de CEP) com lógica de apresentação. Tais responsabilidades podem ser separadas, idealmente utilizando um padrão de arquitetura MVC (Model-View-Controller) ou similar.
+
+Para atender a ideia de encapsulamento de informações e aplicar a programação orientada a objetos, a classe Address.php pode conter os atributos de cada informação do endereço (rua,bairro,estado) e um construtor que, recebe o cep, realiza a requisição para a api e constrói a instância com as informações retornadas. Ficaria parecido com:
+
+<?php
+class Address {
+    private $cep;
+    private $rua;
+    private $bairro;
+    private $estado;
+
+    public function __construct($cep) {
+        $this->cep = preg_replace("/[^0-9]/", "", $cep); // formatação
+        $this->get_address(); // Realiza a requisição no construtor
+    }
+
+    private function get_address() {
+        $url = "http://viacep.com.br/ws/{$this->cep}/xml/";
+        $xml = @simplexml_load_file($url);
+
+        if ($xml) {
+            $this->rua = (string) $xml->logradouro;
+            $this->bairro = (string) $xml->bairro;
+            $this->estado = (string) $xml->uf;
+        } else {
+            // Em caso de falha na requisição, pode-se tratar os erros aqui
+            $this->rua = "Endereço não encontrado";
+            $this->bairro = "";
+            $this->estado = "";
+        }
+    }
+
+    public function getRua() {
+        return $this->rua;
+    }
+    public function getBairro() {
+        return $this->bairro;
+    }
+    // Resto dos gets.
+}
+?>

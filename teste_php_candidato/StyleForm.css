@@ -1,0 +1,39 @@
+/* Estilos para formulários e componentes relacionados */
+
+.main-form{
+   
+    margin-bottom: 15px;
+    margin-left: 65px;
+ }
+ 
+ .input{
+     border: 1px solid #cccccc00;
+     border-radius: 4px 0px 0px 4px;
+     border: 0 none;
+     outline: 0;
+     height: 20px;
+ }
+ 
+ .btn-send{
+     background-color: rgb(187, 186, 186);
+     border: 1px solid #cccccc00;
+     border-radius: 0px 4px 4px 0px;
+     margin-left: 0;
+     height: 21px;
+ }
+ 
+ .container-form{
+     margin-top: 20px;
+     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+     box-shadow: rgba(167, 167, 170, 0.1)0px 7px 29px 0px;
+     align-items: center;
+     margin-left: 30%;
+     width: 500px;
+     background-color: rgb(233, 233, 233);
+     border-radius: 8px;
+     padding: 10px;
+ }
+ 
+ .container-form p{
+     margin: 0;
+ }
